@@ -1,34 +1,98 @@
-# Source — Caster of Magic Savegame Editor
+# CoMWedit — Caster of Magic for Windows Save Editor
 
-Early scaffolding. See `../docs/design.md` for the full plan.
+A savegame editor for Master of Magic: Caster of Magic for Windows (the Steam release). It edits the
+values stored in your saved games.
 
-## Files
-- `CasBind.pas` — dynamic binding to the game's `CasApi.dll` (minimal; grows over time).
-- `protoA.lpr` — **Prototype A**: load a save, edit wizard 0's gold/mana, save it back.
+This is only for Caster of Magic for Windows — not the original DOS Master of Magic or other versions.
 
-## Toolchain (not yet installed on this machine)
-Built with **Free Pascal / Lazarus**, targeting **32-bit (i386)** — the game's `CasApi.dll`
-is 32-bit, so a 64-bit build will not load it.
+## Links
 
-- Download Lazarus (bundles FPC): https://www.lazarus-ide.org/  — the standard Windows
-  installer is 32-bit, which is what we want.
+- **Home page (start here):** https://klassgaming.com/comwedit.html
+- **Download:** https://klassgaming.itch.io/comwedit
+- **Mailing list** (get notified about updates): https://klassgaming.com/mailing-list.html
 
-## Build & run Prototype A
-From a terminal once FPC is on PATH:
+This repository holds the source code. If you just want to use the editor, grab it from the download
+link above.
 
-```
-fpc -Px86 protoA.lpr
-./protoA.exe
-```
+## Features
 
-`protoA` sets its working directory to the game folder itself (so the DLL and the game's
-`Data\` files are found), then writes `PROTOA_TEST.SAV` into the game folder. Load that save
-in the game to confirm wizard 0 has 9999 gold/mana.
+Wizards (yours and the AI players'):
+- Gold, mana, casting skill, fame
+- Disposition toward you, −100 to +100 (AI wizards)
+- Number of spellbooks per realm
+- Retorts (on/off)
+- Spell status: unknown, researchable, or known
 
-## Key facts baked into the binding
-- DLL exports 914 functions by **plain undecorated names** → `GetProcAddress` by name works.
-- Engine lifecycle: `GameInitialize` → `Loadgame2` → (edit) → `Savegame` → wait for
-  `SaveInProgress` to clear → `CloseGame`.
-- `Savegame` is asynchronous (background thread, ~200 MB per save); always wait before exit.
-- The game install path is currently **hard-coded** in `protoA.lpr` — make it configurable
-  before release.
+Cities:
+- Name, owner, race, population
+
+Map:
+- A clickable minimap of both planes
+- Add or remove a tile's resource (ore, gems, wild game, nightshade, etc.)
+- Add or remove corruption on a tile
+
+Heroes:
+- For a chosen wizard and hero, turn abilities on or off, including super versions where they exist
+
+Spell, hero, ability, and retort names are read from the game's data files, so they match any mods
+you have installed.
+
+## Requirements
+
+- Windows, on the PC where the game is installed
+- Caster of Magic for Windows
+
+It is a single program; there is no installer or other files to set up.
+
+## Running it
+
+1. Run CoMWedit.exe. It locates the game folder on its own. If it can't, it asks you to point it to
+   the folder that contains Spells.dat, then remembers it.
+2. Choose a save from the dropdown and click Load.
+3. Edit values on the Wizards, Cities, Map, and Heroes tabs.
+4. Click Save, then load that save in the game.
+
+## Notes
+
+- Save overwrites the slot you chose. The first time you save a slot, it backs up the original to
+  `<slot>.bak` and keeps that copy (it is not overwritten by later saves). Save As writes to a
+  different slot instead.
+- The game only lists saves named like its own slots (1.sav–8.sav, QUICKSAVE.SAV, etc.) in its load
+  menu. A custom name from Save As will not show up there.
+- Do not save a slot in the editor at the same moment the game is writing that slot.
+- CoMWedit changes save files only, not the game itself.
+- Changing a city's race can leave it with buildings that race cannot normally build. This is usually
+  harmless in the game.
+- Stacking a large number of retorts on a single wizard can cause the game to crash when viewing the
+  mirror (default F9 key), but the retorts will still take effect.
+
+## Not included in this version
+
+- Reroll (generating a new map and opponents with the same game settings) is planned for a later
+  version.
+- Terrain editing is planned for a future version.
+
+## Troubleshooting
+
+- "Windows protected your PC" on first run: this appears for unsigned programs. Click More info, then
+  Run anyway. Scan the file first if you prefer.
+- No saves listed, or it keeps asking for the folder: point it to your game folder (the one
+  containing Spells.dat). The choice is saved in CoMWedit.ini next to the program.
+- A change did not appear in the game: confirm you clicked Save in the editor and then loaded that
+  same slot in the game.
+
+## Building from source
+
+See [BUILDING.md](BUILDING.md). In short: open `CasterEditor.lpi` in Lazarus and build for 32-bit
+(i386), or run `lazbuild CasterEditor.lpi`.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+## Disclaimer
+
+Unofficial fan-made tool, not affiliated with the game's developers. Use at your own risk and keep
+backups of saves you care about.
+
+Version 1.0
