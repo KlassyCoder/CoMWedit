@@ -1,0 +1,16 @@
+# Build output (regenerated when you compile)
+lib/
+*.o
+*.ppu
+*.exe
+*.res
+*.compiled
+*.or
+*.a
+*.dbg
+
+# Lazarus per-user session file
+*.lps
+
+# Local config — contains a machine-specific game-folder path
+CoMWedit.ini
